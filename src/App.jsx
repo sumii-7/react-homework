@@ -1,33 +1,79 @@
 import { useState } from "react";
-import "./App.css";
+import { v4 as uuidv4 } from "uuid";
 
-function App() {
-  const [count, setCount] = useState(0);
+const App = () => {
+  const [input, setInput] = useState("");
 
-  const Plus = () => {
-    setCount(count + 1);
+  const [list, setList] = useState([
+    {
+      id: uuidv4(),
+      text: "공부하기",
+      isDone: true,
+    },
+    {
+      id: uuidv4(),
+      text: "놀기",
+      isDone: false,
+    },
+  ]);
+
+  const inputChange = (e) => {
+    setInput(e.target.value);
   };
 
-  const Minus = () => {
-    setCount(count - 1);
+  const addTodo = (e) => {
+    e.preventDefault();
+    if (!input) return;
+
+    const newTodolist = {
+      id: uuidv4(),
+      text: input,
+      isDone: false,
+    };
+    setList([...list, newTodolist]);
+    setInput("");
   };
 
-  const Reset = () => {
-    setCount(0);
+  const ToggleTodo = (id) => {
+    setList(
+      list.map((todo) =>
+        todo.id === id ? { ...todo, isDone: !todo.isDone } : todo
+      )
+    );
+  };
+
+  const deletelist = (id) => {
+    setList(list.filter((todo) => todo.id !== id));
   };
 
   return (
-    <>
-      <div className="wrap">
-        <div>
-          <div className="count">{count}</div>
-          <button onClick={Plus}>+</button>
-          <button onClick={Minus}>-</button>
-          <button onClick={Reset}>reset</button>
-        </div>
-      </div>
-    </>
+    <div>
+      <h1>todolist</h1>
+      <form onSubmit={addTodo}>
+        <input
+          type="text"
+          placeholder="할 일을 입력하세요."
+          value={input}
+          onChange={inputChange}
+        />
+        <button>추가</button>
+      </form>
+      <ul>
+        {list.map((todo) => (
+          <li
+            key={todo.id}
+            style={{ textDecoration: todo.isDone ? "line-through" : "" }}
+          >
+            {todo.text}
+            <button onClick={() => ToggleTodo(todo.id)}>
+              {todo.isDone ? "취소" : "완료"}
+            </button>
+            <button onClick={() => deletelist(todo.id)}>삭제</button>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
-}
+};
 
 export default App;
